@@ -21,7 +21,7 @@ public class GestionnaireAnneau extends UnicastRemoteObject {
     }
 
     public int suivant(int num) throws RemoteException {
-        if (liste.indexOf(num) != liste.size()-1) liste.get(liste.indexOf(num)+1)
+        if (liste.indexOf(num) != liste.size()-1) return liste.get(liste.indexOf(num)+1);
         else return 0;
     }
 
