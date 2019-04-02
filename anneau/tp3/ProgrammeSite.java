@@ -24,8 +24,9 @@ public class ProgrammeSite extends UnicastRemoteObject {
 
 	public void run() throws RemoteException {
 		gestionnaire.ajoueSite(id);
-		//Panne détectée ou première élection
-		
+		ArrayList<Integer> liste = new ArrayList<Integer>();
+		liste.add(id);
+		siteSuivant.election(liste);		
 	}
 
 	public void getSuivant(int suiv) throws RemoteException, NotBoundException, MalformedURLException {
@@ -49,8 +50,11 @@ public class ProgrammeSite extends UnicastRemoteObject {
 		}
 	}
 
-	public void coordinateur(int idEmeteur, SiteInterface r ) throws RemoteException {
-		
+	public void coordinateur(int idEmetteur, SiteInterface r ) throws RemoteException {
+		if (id != idEmetteur){
+			relai = r;
+			siteSuivant.coordinateur(idEmetteur, r);
+		}
 	}
 
 	public synchronized void ecriture() throws RemoteException {
@@ -63,6 +67,6 @@ public class ProgrammeSite extends UnicastRemoteObject {
 
 	public static void main(String[] args) throws NumberFormatException, RemoteException, MalformedURLException, NotBoundException {
 		ProgrammeSite site = new ProgrammeSite(Integer.parseInt(args[0]),args[1]);
-    Naming.rebind ("Site"+args[0], site);
+    	Naming.rebind ("Site"+args[0], site);
 	}
 }
