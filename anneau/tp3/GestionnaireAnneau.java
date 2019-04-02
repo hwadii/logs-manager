@@ -11,12 +11,13 @@ public class GestionnaireAnneau extends UnicastRemoteObject {
     private static final long serialVersionUID = -273169080821700334L;
     private int id;
     private ArrayList<Integer> liste = new ArrayList<Integer>();
+    private int idrelai;
 
     public GestionnaireAnneau(int val) throws RemoteException {
         id = val;
     }
 
-    public synchronized void electionRelai(int num) throws RemoteException {
+    public synchronized void ajoueSite(int num) throws RemoteException {
         liste.add(num);
     }
 
@@ -27,6 +28,16 @@ public class GestionnaireAnneau extends UnicastRemoteObject {
 
     public synchronized void panne(int num) throws RemoteException {
         liste.remove(num);
+        if (idrelai == num) idrelai = -1;
+    }
+
+    public synchronized int electionRelai() throws RemoteException{
+        if (idrelai==-1){
+            for (int idsite : liste){
+                if (idsite > idrelai) idrelai = idsite;
+            }
+        }
+        return idrelai;
     }
 
     public static void main(String[] args) throws NumberFormatException, RemoteException, MalformedURLException {
