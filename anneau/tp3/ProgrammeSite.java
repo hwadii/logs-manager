@@ -1,7 +1,6 @@
 package anneau.tp3;
 
 import java.net.MalformedURLException;
-import java.net.UnknownHostException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
@@ -23,17 +22,17 @@ public class ProgrammeSite extends UnicastRemoteObject {
 		gestionnaire = (GestionnaireInterface) Naming.lookup("rmi://localhost/SousReseau"+num_sousreseau) ;
 	}
 
-	public void run(){
+	public void run() throws RemoteException {
 		gestionnaire.ajoueSite(id);
 		//Panne détectée ou première élection
 		
 	}
 
-	public void getSuivant(int suiv) throws RemoteException {
+	public void getSuivant(int suiv) throws RemoteException, NotBoundException, MalformedURLException {
 		siteSuivant = (SiteInterface) Naming.lookup("rmi://localhost/Site"+suiv) ;
 	}
 
-	public void election(ArrayList<Integer> l) throws RemoteException {
+	public void election(ArrayList<Integer> l) throws RemoteException, NotBoundException, MalformedURLException {
 		int idRelai = -1;
 		for (int idsite : l) 
 			if (idsite==id){
