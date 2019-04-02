@@ -17,10 +17,6 @@ public class ProgrammeSite extends UnicastRemoteObject {
 
     }
 
-    public void gestionnaireAnneau() throws RemoteException{
-
-    }
-
     public void ecriture() throws RemoteException{
 
     }
