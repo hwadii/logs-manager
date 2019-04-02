@@ -7,7 +7,7 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 
-public class GestionnaireAnneau extends UnicastRemoteObject {
+public class GestionnaireAnneau extends UnicastRemoteObject implements GestionnaireInterface {
 
     private static final long serialVersionUID = -273169080821700334L;
     private int id;
@@ -20,8 +20,10 @@ public class GestionnaireAnneau extends UnicastRemoteObject {
     // Service appelé par un nouveau site pour s'ajouter à la liste et actualise les
     // services suivants des sites
     // num: id du nouveau site
-    public synchronized void ajoueSite(int num) throws RemoteException, MalformedURLException, NotBoundException {
+    public synchronized void ajoueSite(int num) throws MalformedURLException, RemoteException, NotBoundException {
         liste.add(num);
+        System.out.println("Ajout du site " + num);
+        System.out.println(liste);
         if (liste.size()!=1){
             SiteInterface sitePrecedent = (SiteInterface) Naming.lookup("rmi://localhost/Site"+(liste.size()-2)) ;
             sitePrecedent.getSuivant(num);
@@ -34,6 +36,7 @@ public class GestionnaireAnneau extends UnicastRemoteObject {
     //num: id du site en panne
     public synchronized void panne(int num) throws RemoteException, MalformedURLException, NotBoundException {
         int indexCourant = liste.indexOf(num);
+        System.out.println("Panne du site " + num);
         if (indexCourant!=0){
             SiteInterface sitePrecedent = (SiteInterface) Naming.lookup("rmi://localhost/Site"+(indexCourant-1)) ;
             if (indexCourant != liste.size()-1){
@@ -46,6 +49,7 @@ public class GestionnaireAnneau extends UnicastRemoteObject {
             sitePrecedent.getSuivant(liste.get(1));
         }
         liste.remove(num);
+        System.out.println(liste);
     }
 
     //On crée un gestionnaire d'anneau et on expose ses services
