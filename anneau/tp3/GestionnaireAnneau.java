@@ -11,38 +11,41 @@ public class GestionnaireAnneau extends UnicastRemoteObject {
     private static final long serialVersionUID = -273169080821700334L;
     private int id;
     private ArrayList<Integer> liste = new ArrayList<Integer>();
-    private int idrelai;
 
     public GestionnaireAnneau(int val) throws RemoteException {
         id = val;
     }
 
+    //Service appelé par un nouveau site pour s'ajouter à la liste et actualise les services suivants des sites
     public synchronized void ajoueSite(int num) throws RemoteException {
         liste.add(num);
-    }
-
-    public int suivant(int num) throws RemoteException {
-        if (liste.indexOf(num) != liste.size()-1) return liste.get(liste.indexOf(num)+1);
-        else return 0;
+        if (liste.size()!=1){
+            SiteInterface sitePrecedent = (SiteInterface) Naming.lookup("rmi://localhost/Site"+(liste.size()-2)) ;
+            sitePrecedent.getSuivant(num);
+            SiteInterface siteDernier = (SiteInterface) Naming.lookup("rmi://localhost/Site"+(liste.size()-1)) ;
+            siteDernier.getSuivant(liste.get(0));
+        }
     }
 
     public synchronized void panne(int num) throws RemoteException {
-        liste.remove(num);
-        if (idrelai == num) idrelai = -1;
-    }
-
-    public synchronized int electionRelai() throws RemoteException{
-        if (idrelai==-1){
-            for (int idsite : liste){
-                if (idsite > idrelai) idrelai = idsite;
+        int indexCourant = liste.indexOf(num);
+        if (indexCourant!=0){
+            SiteInterface sitePrecedent = (SiteInterface) Naming.lookup("rmi://localhost/Site"+(indexCourant-1)) ;
+            if (indexCourant != liste.size()-1){
+                sitePrecedent.getSuivant(liste.get(indexCourant+1));
+            } else {
+                sitePrecedent.getSuivant(liste.get(0));
             }
+        } else {
+            SiteInterface sitePrecedent = (SiteInterface) Naming.lookup("rmi://localhost/Site"+(liste.size()-1)) ;
+            sitePrecedent.getSuivant(liste.get(1));
         }
-        return idrelai;
+        liste.remove(num);
     }
 
     public static void main(String[] args) throws NumberFormatException, RemoteException, MalformedURLException {
         GestionnaireAnneau serveurAnneau = new GestionnaireAnneau(Integer.parseInt(args[0]));
-        Naming.rebind ("Site"+args[0], serveurAnneau);
+        Naming.rebind ("SousReseau"+args[0], serveurAnneau);
     }
 
 }
