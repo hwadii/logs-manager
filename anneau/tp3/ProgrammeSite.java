@@ -5,16 +5,17 @@ import java.net.UnknownHostException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 
 public class ProgrammeSite extends UnicastRemoteObject {
 	private static final long serialVersionUID = -5525072849826389368L;
 	private int id;
-	private int relais;
 	private String num_sousreseau;
 	private GestionnaireInterface gestionnaire;
 	private SiteInterface siteSuivant;
+	private SiteInterface relai;
 
 	public ProgrammeSite(int val, String sr) throws RemoteException, MalformedURLException, NotBoundException {
 		id = val;
@@ -32,14 +33,25 @@ public class ProgrammeSite extends UnicastRemoteObject {
 		siteSuivant = (SiteInterface) Naming.lookup("rmi://localhost/Site"+suiv) ;
 	}
 
-	public void envoieListe(ArrayList<Integer> l) throws RemoteException {
-		for (int idsite : l) if (idsite==id){
-			//Collections.max(l);
+	public void election(ArrayList<Integer> l) throws RemoteException {
+		int idRelai = -1;
+		for (int idsite : l) 
+			if (idsite==id){
+				idRelai = Collections.max(l);
+				SiteInterface r = (SiteInterface) Naming.lookup("rmi://localhost/Site"+idRelai) ;
+				siteSuivant.coordinateur(id, r);
+				return;
+			}
+
+		if (idRelai==-1){
+			ArrayList<Integer> newlist = l;
+			newlist.add(id);
+			siteSuivant.election(newlist);
 		}
-		ArrayList<Integer> newlist = l;
-		newlist.add(id);
-		int idsuiv = gestionnaire.suivant(id);
-		.envoieListe()
+	}
+
+	public void coordinateur(int idEmeteur, SiteInterface r ) throws RemoteException {
+		
 	}
 
 	public synchronized void ecriture() throws RemoteException {

@@ -17,6 +17,7 @@ public class GestionnaireAnneau extends UnicastRemoteObject {
     }
 
     //Service appelé par un nouveau site pour s'ajouter à la liste et actualise les services suivants des sites
+    //num: id du nouveau site
     public synchronized void ajoueSite(int num) throws RemoteException {
         liste.add(num);
         if (liste.size()!=1){
@@ -27,6 +28,8 @@ public class GestionnaireAnneau extends UnicastRemoteObject {
         }
     }
 
+    //Service appelé par le site détectant la panne pour supprimer le site de la liste et actualise les services suivants des sites
+    //num: id du site en panne
     public synchronized void panne(int num) throws RemoteException {
         int indexCourant = liste.indexOf(num);
         if (indexCourant!=0){
@@ -43,6 +46,7 @@ public class GestionnaireAnneau extends UnicastRemoteObject {
         liste.remove(num);
     }
 
+    //On crée un gestionnaire d'anneau et on expose ses services
     public static void main(String[] args) throws NumberFormatException, RemoteException, MalformedURLException {
         GestionnaireAnneau serveurAnneau = new GestionnaireAnneau(Integer.parseInt(args[0]));
         Naming.rebind ("SousReseau"+args[0], serveurAnneau);
