@@ -33,6 +33,6 @@ public class ProgrammeSite extends UnicastRemoteObject {
 
 	public static void main(String[] args) throws NumberFormatException, RemoteException, MalformedURLException {
 		ProgrammeSite site = new ProgrammeSite(Integer.parseInt(args[0]),args[1]);
-        Naming.rebind ("Site"+args[0], site);
+    Naming.rebind ("Site"+args[0], site);
 	}
 }
