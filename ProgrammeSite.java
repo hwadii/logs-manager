@@ -6,6 +6,7 @@ import java.rmi.server.UnicastRemoteObject;
 import java.rmi.Naming;
 
 public class ProgrammeSite extends UnicastRemoteObject {
+    private static final long serialVersionUID = -5525072849826389368L;
     private int id;
     private int relais;
 
