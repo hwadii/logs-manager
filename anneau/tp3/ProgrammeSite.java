@@ -1,13 +1,12 @@
 package anneau.tp3;
 
-import java.net.ConnectException;
 import java.net.MalformedURLException;
+import java.rmi.Naming;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.rmi.Naming;
-import java.rmi.NotBoundException;
 
 public class ProgrammeSite extends UnicastRemoteObject implements SiteInterface {
 	private static final long serialVersionUID = -5525072849826389368L;
@@ -34,13 +33,8 @@ public class ProgrammeSite extends UnicastRemoteObject implements SiteInterface 
 	}
 
 	public void getSuivant(int suiv) throws RemoteException, NotBoundException, MalformedURLException {
-		try {
-			siteSuivant = (SiteInterface) Naming.lookup("rmi://localhost/Site"+suiv) ;
-			idSiteSuivant = suiv;
-		} catch (RemoteException e) {
-			System.out.println("Panne de " + suiv);
-			gestionnaire.panne(suiv);
-		}
+		siteSuivant = (SiteInterface) Naming.lookup("rmi://localhost/Site"+suiv) ;
+		idSiteSuivant = suiv;
 	}
 
 	public void election(ArrayList<Integer> l) throws RemoteException, NotBoundException, MalformedURLException {
@@ -84,6 +78,10 @@ public class ProgrammeSite extends UnicastRemoteObject implements SiteInterface 
 				gestionnaire.panne(idSiteSuivant);
 			}
 		}
+	}
+
+	public void exist() throws RemoteException, MalformedURLException, NotBoundException {
+		return;
 	}
 
 	public synchronized void ecriture() throws RemoteException {

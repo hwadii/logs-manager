@@ -21,14 +21,32 @@ public class GestionnaireAnneau extends UnicastRemoteObject implements Gestionna
     // services suivants des sites
     // num: id du nouveau site
     public synchronized void ajoueSite(int num) throws MalformedURLException, RemoteException, NotBoundException {
-        liste.add(num);
-        System.out.println("Ajout du site " + num);
-        System.out.println(liste);
-        if (liste.size()!=1){
-            SiteInterface sitePrecedent = (SiteInterface) Naming.lookup("rmi://localhost/Site"+(liste.size()-2)) ;
-            sitePrecedent.getSuivant(num);
-            SiteInterface siteDernier = (SiteInterface) Naming.lookup("rmi://localhost/Site"+(liste.size()-1)) ;
-            siteDernier.getSuivant(liste.get(0));
+        if (liste.size()>0){
+            try {
+                SiteInterface sitePrecedent = (SiteInterface) Naming.lookup("rmi://localhost/Site"+(liste.get(liste.size()-1)));
+                sitePrecedent.getSuivant(num);
+                try {
+                    SiteInterface siteDernier = (SiteInterface) Naming.lookup("rmi://localhost/Site"+num);
+                    siteDernier.getSuivant(liste.get(0));
+                    SiteInterface sitePremier = (SiteInterface) Naming.lookup("rmi://localhost/Site" + liste.get(0));
+                    sitePremier.exist();
+                    liste.add(num);
+                    System.out.println("Ajout du site " + num);
+                    System.out.println(liste);
+                } catch (RemoteException e) {
+                    System.out.println("Panne du suivant " + liste.get(0));
+                    panne(liste.get(0));
+                    ajoueSite(num);
+                }
+            } catch (RemoteException e) {
+                System.out.println("Panne du précédent " + liste.get(liste.size()-1));
+                panne(liste.get(liste.size()-1));
+                ajoueSite(num);
+            }
+        } else {
+            liste.add(num);
+            System.out.println("Ajout du site else " + num);
+            System.out.println(liste);
         }
     }
 
@@ -38,17 +56,18 @@ public class GestionnaireAnneau extends UnicastRemoteObject implements Gestionna
         int indexCourant = liste.indexOf(num);
         System.out.println("Panne du site " + num);
         if (indexCourant!=0){
-            SiteInterface sitePrecedent = (SiteInterface) Naming.lookup("rmi://localhost/Site"+(indexCourant-1)) ;
+            SiteInterface sitePrecedent = (SiteInterface) Naming.lookup("rmi://localhost/Site"+(indexCourant-1));
             if (indexCourant != liste.size()-1){
                 sitePrecedent.getSuivant(liste.get(indexCourant+1));
-            } else {
+            } else if (liste.size() > 2) {
                 sitePrecedent.getSuivant(liste.get(0));
             }
-        } else {
+        } else if (liste.size() > 2) {
             SiteInterface sitePrecedent = (SiteInterface) Naming.lookup("rmi://localhost/Site"+(liste.size()-1)) ;
             sitePrecedent.getSuivant(liste.get(1));
         }
-        liste.remove(num);
+
+        liste.remove(liste.indexOf(num));
         System.out.println(liste);
     }
 
