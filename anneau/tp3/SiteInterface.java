@@ -16,7 +16,7 @@ public interface SiteInterface extends Remote {
 
   public void election(ArrayList<Integer> l) throws RemoteException, NotBoundException, MalformedURLException;
 
-  public void coordinateur(int idEmeteur, SiteInterface r) throws RemoteException, MalformedURLException, NotBoundException;
+  public void coordinateur(int idEmeteur, SiteInterface r, int idRelai) throws RemoteException, MalformedURLException, NotBoundException;
 
   public void ecriture() throws RemoteException;
 

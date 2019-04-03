@@ -1,5 +1,6 @@
 package anneau.tp3;
 
+import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -11,6 +12,7 @@ import java.rmi.NotBoundException;
 public class ProgrammeSite extends UnicastRemoteObject implements SiteInterface {
 	private static final long serialVersionUID = -5525072849826389368L;
 	private int id;
+	private int idr;
 	private int idSiteSuivant;
 	private String num_sousreseau;
 	private GestionnaireInterface gestionnaire;
@@ -32,8 +34,13 @@ public class ProgrammeSite extends UnicastRemoteObject implements SiteInterface 
 	}
 
 	public void getSuivant(int suiv) throws RemoteException, NotBoundException, MalformedURLException {
-		siteSuivant = (SiteInterface) Naming.lookup("rmi://localhost/Site"+suiv) ;
-		idSiteSuivant = suiv;
+		try {
+			siteSuivant = (SiteInterface) Naming.lookup("rmi://localhost/Site"+suiv) ;
+			idSiteSuivant = suiv;
+		} catch (RemoteException e) {
+			System.out.println("Panne de " + suiv);
+			gestionnaire.panne(suiv);
+		}
 	}
 
 	public void election(ArrayList<Integer> l) throws RemoteException, NotBoundException, MalformedURLException {
@@ -41,10 +48,13 @@ public class ProgrammeSite extends UnicastRemoteObject implements SiteInterface 
 		for (int idsite : l) 
 			if (idsite==id && idRelai == -1){
 				idRelai = Collections.max(l);
+				idr = idRelai;
 				SiteInterface r = (SiteInterface) Naming.lookup("rmi://localhost/Site"+idRelai) ;
 				try {
-					siteSuivant.coordinateur(id, r);
+					System.out.println("Coordinateur: id " + id + ", r " + idRelai);
+					siteSuivant.coordinateur(id, r, idr);
 				} catch (RemoteException e) {
+					System.out.println("Panne");
 					gestionnaire.panne(idSiteSuivant);
 				}
 			}
@@ -53,19 +63,24 @@ public class ProgrammeSite extends UnicastRemoteObject implements SiteInterface 
 			ArrayList<Integer> newlist = l;
 			newlist.add(id);
 			try {
+				System.out.println("Election " + newlist);
 				siteSuivant.election(newlist);
 			} catch (RemoteException e) {
+				System.out.println("Panne");
 				gestionnaire.panne(idSiteSuivant);
 			}
 		}
 	}
 
-	public void coordinateur(int idEmetteur, SiteInterface r ) throws RemoteException, MalformedURLException, NotBoundException {
+	public void coordinateur(int idEmetteur, SiteInterface r, int idRelai) throws RemoteException, MalformedURLException, NotBoundException {
 		if (id != idEmetteur){
 			relai = r;
+			idr = idRelai;
 			try {
-				siteSuivant.coordinateur(idEmetteur, r);
+				System.out.println("Coordinateur: " + idr);
+				siteSuivant.coordinateur(idEmetteur, r, idr);
 			} catch (RemoteException e) {
+				System.out.println("Panne");
 				gestionnaire.panne(idSiteSuivant);
 			}
 		}
