@@ -23,6 +23,7 @@ public class GestionnaireAnneau extends UnicastRemoteObject implements Gestionna
     public synchronized void ajoueSite(int num) throws MalformedURLException, RemoteException, NotBoundException {
         if (liste.size()>0){
             try {
+                if (liste.contains(num)) liste.remove(liste.indexOf(num));
                 SiteInterface sitePrecedent = (SiteInterface) Naming.lookup("rmi://localhost/Site"+(liste.get(liste.size()-1)));
                 sitePrecedent.getSuivant(num);
                 try {
