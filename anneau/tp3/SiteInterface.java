@@ -16,11 +16,11 @@ public interface SiteInterface extends Remote {
 
   public void election(ArrayList<Integer> l) throws RemoteException, NotBoundException, MalformedURLException;
 
-  public void coordinateur(int idEmeteur, SiteInterface r, int idRelai) throws RemoteException, MalformedURLException, NotBoundException;
+  public void coordinateur(int idEmeteur, int idRelai) throws RemoteException, MalformedURLException, NotBoundException;
 
   public void exist() throws RemoteException, MalformedURLException, NotBoundException;
 
-  public void ecriture() throws RemoteException;
+  public void envoieMsgRelai(String message) throws RemoteException;
 
-  public void reponseClient() throws RemoteException;
+  public void ecriture(String message) throws RemoteException;
 }

@@ -17,19 +17,29 @@ public class ProgrammeSite extends UnicastRemoteObject implements SiteInterface 
 	private GestionnaireInterface gestionnaire;
 	private SiteInterface siteSuivant;
 	private SiteInterface relai;
+	private String log;
 
 	public ProgrammeSite(int val, String sr) throws RemoteException, MalformedURLException, NotBoundException {
 		id = val;
 		num_sousreseau = sr;
 		gestionnaire = (GestionnaireInterface) Naming.lookup("rmi://localhost/SousReseau"+num_sousreseau) ;
+		log = "";
 	}
 
 	public void run() throws RemoteException, MalformedURLException, NotBoundException {
+		idr = gestionnaire.getIdRelai();
+		if (idr == -1){
+			gestionnaire.setIdRelai(id);
+			idr = id;
+		}
+		relai = (SiteInterface) Naming.lookup("rmi://localhost/Site"+idr) ;
 		gestionnaire.ajoueSite(id);
 		ArrayList<Integer> liste = new ArrayList<Integer>();
 		liste.add(id);
-		if (siteSuivant != null)
+		if (siteSuivant != null){
 			siteSuivant.election(liste);
+			relai.envoieMsgRelai("Sous-réseau: " + num_sousreseau + " Site: " + id + " - Nouveau site: " + id);
+		}
 	}
 
 	public void getSuivant(int suiv) throws RemoteException, NotBoundException, MalformedURLException {
@@ -43,12 +53,12 @@ public class ProgrammeSite extends UnicastRemoteObject implements SiteInterface 
 			if (idsite==id && idRelai == -1){
 				idRelai = Collections.max(l);
 				idr = idRelai;
-				SiteInterface r = (SiteInterface) Naming.lookup("rmi://localhost/Site"+idRelai) ;
+				relai = (SiteInterface) Naming.lookup("rmi://localhost/Site"+idr) ;
 				try {
-					System.out.println("Coordinateur: id " + id + ", r " + idRelai);
-					siteSuivant.coordinateur(id, r, idr);
+					relai.envoieMsgRelai("Sous-réseau: " + num_sousreseau + " Site: " + id + " - Coordinateur: " + idRelai);
+					siteSuivant.coordinateur(id, idr);
 				} catch (RemoteException e) {
-					System.out.println("Panne");
+					relai.envoieMsgRelai("Sous-réseau: " + num_sousreseau + " Site: " + id + " - Panne: " + idSiteSuivant);
 					gestionnaire.panne(idSiteSuivant);
 				}
 			}
@@ -57,24 +67,25 @@ public class ProgrammeSite extends UnicastRemoteObject implements SiteInterface 
 			ArrayList<Integer> newlist = l;
 			newlist.add(id);
 			try {
-				System.out.println("Election " + newlist);
+				relai.envoieMsgRelai("Sous-réseau: " + num_sousreseau + " Site: " + id + " - Election: " + newlist);
 				siteSuivant.election(newlist);
 			} catch (RemoteException e) {
-				System.out.println("Panne");
+				relai.envoieMsgRelai("Sous-réseau: " + num_sousreseau + " Site: " + id + " - Panne: " + idSiteSuivant);
 				gestionnaire.panne(idSiteSuivant);
 			}
 		}
 	}
 
-	public void coordinateur(int idEmetteur, SiteInterface r, int idRelai) throws RemoteException, MalformedURLException, NotBoundException {
+	public void coordinateur(int idEmetteur, int idRelai) throws RemoteException, MalformedURLException, NotBoundException {
+		if (id == idr) gestionnaire.setIdRelai(id);
 		if (id != idEmetteur){
-			relai = r;
 			idr = idRelai;
+			relai = (SiteInterface) Naming.lookup("rmi://localhost/Site"+idr) ;
 			try {
-				System.out.println("Coordinateur: " + idr);
-				siteSuivant.coordinateur(idEmetteur, r, idr);
+				relai.envoieMsgRelai("Sous-réseau: " + num_sousreseau + " Site: " + id + " - Coordinateur: " + idr);
+				siteSuivant.coordinateur(idEmetteur, idr);
 			} catch (RemoteException e) {
-				System.out.println("Panne");
+				relai.envoieMsgRelai("Sous-réseau: " + num_sousreseau + " Site: " + id + " - Panne: " + idSiteSuivant);
 				gestionnaire.panne(idSiteSuivant);
 			}
 		}
@@ -84,12 +95,14 @@ public class ProgrammeSite extends UnicastRemoteObject implements SiteInterface 
 		return;
 	}
 
-	public synchronized void ecriture() throws RemoteException {
-
+	public void envoieMsgRelai(String message) throws RemoteException {
+		relai.ecriture(message);
 	}
 
-	public void reponseClient() throws RemoteException {
-
+	public synchronized void ecriture(String message) throws RemoteException {
+		log = log + message + "\n";
+		System.out.println("nouveau log: ");
+		System.out.println(log);
 	}
 
 	public static void main(String[] args) throws NumberFormatException, RemoteException, MalformedURLException, NotBoundException {
