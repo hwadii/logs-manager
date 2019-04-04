@@ -26,12 +26,12 @@ public class GestionnaireAnneau extends UnicastRemoteObject implements Gestionna
         if (liste.size()>0){
             try {
                 if (liste.contains(num)) liste.remove(liste.indexOf(num));
-                SiteInterface sitePrecedent = (SiteInterface) Naming.lookup("rmi://localhost/Site"+(liste.get(liste.size()-1)));
+                SiteInterface sitePrecedent = (SiteInterface) Naming.lookup("rmi://localhost/Site"+id+(liste.get(liste.size()-1)));
                 sitePrecedent.getSuivant(num);
                 try {
-                    SiteInterface siteDernier = (SiteInterface) Naming.lookup("rmi://localhost/Site"+num);
+                    SiteInterface siteDernier = (SiteInterface) Naming.lookup("rmi://localhost/Site"+id+num);
                     siteDernier.getSuivant(liste.get(0));
-                    SiteInterface sitePremier = (SiteInterface) Naming.lookup("rmi://localhost/Site" + liste.get(0));
+                    SiteInterface sitePremier = (SiteInterface) Naming.lookup("rmi://localhost/Site"+id + liste.get(0));
                     sitePremier.exist();
                     liste.add(num);
                 } catch (RemoteException e) {
@@ -56,7 +56,7 @@ public class GestionnaireAnneau extends UnicastRemoteObject implements Gestionna
     public synchronized void panne(int num) throws RemoteException, MalformedURLException, NotBoundException {
         int indexCourant = liste.indexOf(num);
         if (indexCourant!=0){
-            SiteInterface sitePrecedent = (SiteInterface) Naming.lookup("rmi://localhost/Site"+(indexCourant-1));
+            SiteInterface sitePrecedent = (SiteInterface) Naming.lookup("rmi://localhost/Site"+id+(indexCourant-1));
             if (indexCourant != liste.size()-1){
                 try{
                     sitePrecedent.getSuivant(liste.get(indexCourant+1));
@@ -71,7 +71,7 @@ public class GestionnaireAnneau extends UnicastRemoteObject implements Gestionna
                 }
             }
         } else if (liste.size() > 2) {
-            SiteInterface sitePrecedent = (SiteInterface) Naming.lookup("rmi://localhost/Site"+(liste.size()-1)) ;
+            SiteInterface sitePrecedent = (SiteInterface) Naming.lookup("rmi://localhost/Site"+id+(liste.size()-1)) ;
             try {
                 sitePrecedent.getSuivant(liste.get(1));
             } catch (RemoteException e) {
