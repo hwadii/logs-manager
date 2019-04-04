@@ -13,7 +13,7 @@ public class ProgrammeSite extends UnicastRemoteObject implements SiteInterface 
 	private int id;
 	private int idr;
 	private int idSiteSuivant;
-	private String num_sousreseau;
+	private static String num_sousreseau;
 	private GestionnaireInterface gestionnaire;
 	private SiteInterface siteSuivant;
 	private SiteInterface relai;
@@ -34,7 +34,7 @@ public class ProgrammeSite extends UnicastRemoteObject implements SiteInterface 
 			gestionnaire.setIdRelai(id);
 			idr = id;
 		}
-		relai = (SiteInterface) Naming.lookup("rmi://localhost/Site"+idr) ;
+		relai = (SiteInterface) Naming.lookup("rmi://localhost/Site"+num_sousreseau+idr) ;
 		gestionnaire.ajoueSite(id);
 		ArrayList<Integer> liste = new ArrayList<Integer>();
 		liste.add(id);
@@ -45,7 +45,7 @@ public class ProgrammeSite extends UnicastRemoteObject implements SiteInterface 
 	}
 
 	public void getSuivant(int suiv) throws RemoteException, NotBoundException, MalformedURLException {
-		siteSuivant = (SiteInterface) Naming.lookup("rmi://localhost/Site"+suiv) ;
+		siteSuivant = (SiteInterface) Naming.lookup("rmi://localhost/Site"+num_sousreseau+suiv) ;
 		idSiteSuivant = suiv;
 	}
 
@@ -55,7 +55,7 @@ public class ProgrammeSite extends UnicastRemoteObject implements SiteInterface 
 			if (idsite==id && idRelai == -1){
 				idRelai = Collections.max(l);
 				idr = idRelai;
-				relai = (SiteInterface) Naming.lookup("rmi://localhost/Site"+idr) ;
+				relai = (SiteInterface) Naming.lookup("rmi://localhost/Site"+num_sousreseau+idr) ;
 				try {
 					relai.envoieMsgRelai("[" + Util.timestamp() + "] " + "Sous-réseau: " + num_sousreseau + " Site: " + id + " - Coordinateur: " + idRelai);
 					siteSuivant.coordinateur(id, idr);
@@ -82,7 +82,7 @@ public class ProgrammeSite extends UnicastRemoteObject implements SiteInterface 
 		if (id == idr) gestionnaire.setIdRelai(id);
 		if (id != idEmetteur){
 			idr = idRelai;
-			relai = (SiteInterface) Naming.lookup("rmi://localhost/Site"+idr) ;
+			relai = (SiteInterface) Naming.lookup("rmi://localhost/Site"+num_sousreseau+idr) ;
 			try {
 				relai.envoieMsgRelai(tmplog + "[" + Util.timestamp() + "] Sous-réseau: " + num_sousreseau + " Site: " + id + " - Coordinateur: " + idr);
 				siteSuivant.coordinateur(idEmetteur, idr);
@@ -110,7 +110,7 @@ public class ProgrammeSite extends UnicastRemoteObject implements SiteInterface 
 
 	public static void main(String[] args) throws NumberFormatException, RemoteException, MalformedURLException, NotBoundException {
 		ProgrammeSite site = new ProgrammeSite(Integer.parseInt(args[0]),args[1]);
-		Naming.rebind ("rmi://localhost/Site"+args[0], site);
+		Naming.rebind("rmi://localhost/Site"+num_sousreseau+args[0], site);
 		site.run();
 	}
 }
