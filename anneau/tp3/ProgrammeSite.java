@@ -40,7 +40,7 @@ public class ProgrammeSite extends UnicastRemoteObject implements SiteInterface 
 		liste.add(id);
 		if (siteSuivant != null){
 			siteSuivant.election(liste);
-			relai.envoieMsgRelai("Sous-réseau: " + num_sousreseau + " Site: " + id + " - Nouveau site: " + id);
+			relai.envoieMsgRelai("[" + Util.timestamp() + "] Sous-réseau: " + num_sousreseau + " Site: " + id + " - Nouveau site: " + id);
 		}
 	}
 
@@ -57,10 +57,10 @@ public class ProgrammeSite extends UnicastRemoteObject implements SiteInterface 
 				idr = idRelai;
 				relai = (SiteInterface) Naming.lookup("rmi://localhost/Site"+idr) ;
 				try {
-					relai.envoieMsgRelai("Sous-réseau: " + num_sousreseau + " Site: " + id + " - Coordinateur: " + idRelai);
+					relai.envoieMsgRelai("[" + Util.timestamp() + "] " + "Sous-réseau: " + num_sousreseau + " Site: " + id + " - Coordinateur: " + idRelai);
 					siteSuivant.coordinateur(id, idr);
 				} catch (RemoteException e) {
-					relai.envoieMsgRelai("Sous-réseau: " + num_sousreseau + " Site: " + id + " - Panne: " + idSiteSuivant);
+					relai.envoieMsgRelai("[" + Util.timestamp() + "] " + "Sous-réseau: " + num_sousreseau + " Site: " + id + " - Panne: " + idSiteSuivant);
 					gestionnaire.panne(idSiteSuivant);
 				}
 			}
@@ -69,10 +69,10 @@ public class ProgrammeSite extends UnicastRemoteObject implements SiteInterface 
 			ArrayList<Integer> newlist = l;
 			newlist.add(id);
 			try {
-				tmplog += "Sous-réseau: " + num_sousreseau + " Site: " + id + " - Election: " + newlist + "\n";
+				tmplog += "[" + Util.timestamp() + "] Sous-réseau: " + num_sousreseau + " Site: " + id + " - Election: " + newlist + "\n";
 				siteSuivant.election(newlist);
 			} catch (RemoteException e) {
-				tmplog += "Sous-réseau: " + num_sousreseau + " Site: " + id + " - Panne: " + idSiteSuivant + "\n";
+				tmplog += "[" + Util.timestamp() + "] Sous-réseau: " + num_sousreseau + " Site: " + id + " - Panne: " + idSiteSuivant + "\n";
 				gestionnaire.panne(idSiteSuivant);
 			}
 		}
@@ -84,10 +84,10 @@ public class ProgrammeSite extends UnicastRemoteObject implements SiteInterface 
 			idr = idRelai;
 			relai = (SiteInterface) Naming.lookup("rmi://localhost/Site"+idr) ;
 			try {
-				relai.envoieMsgRelai(tmplog + "Sous-réseau: " + num_sousreseau + " Site: " + id + " - Coordinateur: " + idr);
+				relai.envoieMsgRelai(tmplog + "[" + Util.timestamp() + "] Sous-réseau: " + num_sousreseau + " Site: " + id + " - Coordinateur: " + idr);
 				siteSuivant.coordinateur(idEmetteur, idr);
 			} catch (RemoteException e) {
-				relai.envoieMsgRelai(tmplog + "Sous-réseau: " + num_sousreseau + " Site: " + id + " - Panne: " + idSiteSuivant);
+				relai.envoieMsgRelai(tmplog + "[" + Util.timestamp() + "] Sous-réseau: " + num_sousreseau + " Site: " + id + " - Panne: " + idSiteSuivant);
 				gestionnaire.panne(idSiteSuivant);
 			}
 			tmplog = "";
@@ -104,7 +104,7 @@ public class ProgrammeSite extends UnicastRemoteObject implements SiteInterface 
 
 	public synchronized void ecriture(String message) throws RemoteException {
 		log = log + message + "\n";
-		System.out.println("nouveau log: ");
+		System.out.println("Nouveau log: ");
 		System.out.println(log);
 	}
 
