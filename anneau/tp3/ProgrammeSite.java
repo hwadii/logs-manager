@@ -18,12 +18,14 @@ public class ProgrammeSite extends UnicastRemoteObject implements SiteInterface 
 	private SiteInterface siteSuivant;
 	private SiteInterface relai;
 	private String log;
+	private String tmplog;
 
 	public ProgrammeSite(int val, String sr) throws RemoteException, MalformedURLException, NotBoundException {
 		id = val;
 		num_sousreseau = sr;
 		gestionnaire = (GestionnaireInterface) Naming.lookup("rmi://localhost/SousReseau"+num_sousreseau) ;
 		log = "";
+		tmplog = "";
 	}
 
 	public void run() throws RemoteException, MalformedURLException, NotBoundException {
@@ -67,10 +69,10 @@ public class ProgrammeSite extends UnicastRemoteObject implements SiteInterface 
 			ArrayList<Integer> newlist = l;
 			newlist.add(id);
 			try {
-				relai.envoieMsgRelai("Sous-réseau: " + num_sousreseau + " Site: " + id + " - Election: " + newlist);
+				tmplog += "Sous-réseau: " + num_sousreseau + " Site: " + id + " - Election: " + newlist + "\n";
 				siteSuivant.election(newlist);
 			} catch (RemoteException e) {
-				relai.envoieMsgRelai("Sous-réseau: " + num_sousreseau + " Site: " + id + " - Panne: " + idSiteSuivant);
+				tmplog += "Sous-réseau: " + num_sousreseau + " Site: " + id + " - Panne: " + idSiteSuivant + "\n";
 				gestionnaire.panne(idSiteSuivant);
 			}
 		}
@@ -82,12 +84,13 @@ public class ProgrammeSite extends UnicastRemoteObject implements SiteInterface 
 			idr = idRelai;
 			relai = (SiteInterface) Naming.lookup("rmi://localhost/Site"+idr) ;
 			try {
-				relai.envoieMsgRelai("Sous-réseau: " + num_sousreseau + " Site: " + id + " - Coordinateur: " + idr);
+				relai.envoieMsgRelai(tmplog + "Sous-réseau: " + num_sousreseau + " Site: " + id + " - Coordinateur: " + idr);
 				siteSuivant.coordinateur(idEmetteur, idr);
 			} catch (RemoteException e) {
-				relai.envoieMsgRelai("Sous-réseau: " + num_sousreseau + " Site: " + id + " - Panne: " + idSiteSuivant);
+				relai.envoieMsgRelai(tmplog + "Sous-réseau: " + num_sousreseau + " Site: " + id + " - Panne: " + idSiteSuivant);
 				gestionnaire.panne(idSiteSuivant);
 			}
+			tmplog = "";
 		}
 	}
 
