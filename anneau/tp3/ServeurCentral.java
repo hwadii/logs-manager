@@ -32,7 +32,6 @@ public class ServeurCentral extends UnicastRemoteObject implements ServeurInterf
   }
 
   public void run() throws MalformedURLException, RemoteException, NotBoundException {
-    System.out.println("je suis dans le run");
     listeIdRelais.clear();
     GestionnaireInterface g;
     for (int id : listeSousReseaux) {
@@ -48,7 +47,6 @@ public class ServeurCentral extends UnicastRemoteObject implements ServeurInterf
         if (listeIdRelais.get(i) != -1) {
           relai = (SiteInterface) Naming.lookup("rmi://localhost/Site"+listeSousReseaux.get(i)+listeIdRelais.get(i));
           relai.ecritureGlobal();
-          System.out.println(listeSousReseaux.get(i) + " " +listeIdRelais.get(i));
         }
       } catch (RemoteException  e) {
         g = (GestionnaireInterface) Naming.lookup("rmi://localhost/SousReseau"+listeSousReseaux.get(i));
@@ -57,7 +55,7 @@ public class ServeurCentral extends UnicastRemoteObject implements ServeurInterf
     }
 
     try {
-      BufferedWriter writer = new BufferedWriter(new FileWriter("log.txt"));
+      BufferedWriter writer = new BufferedWriter(new FileWriter("logs.txt"));
       writer.write(log);
       writer.close();
     } catch (IOException e) {
