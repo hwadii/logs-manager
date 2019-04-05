@@ -44,3 +44,15 @@ Chaque commande doit être exécutée dans un nouveau terminal:
 12. `java anneau.tp3.ProgrammeSite 0 2`
 13. `java anneau.tp3.ProgrammeSite 1 2`
 14. `java anneau.tp3.ProgrammeSite 2 2`
+
+## Fonctionnalités
+
+- Prise en charge des pannes
+- Écriture sur un fichier `logs.txt` 
+- Utilisation de `synchronized`
+
+## Étudiants
+- COLAS Adam
+- EL MAJDOUBI Soukaina
+- HAJJI Wadii
+- HUSS Sylvain
