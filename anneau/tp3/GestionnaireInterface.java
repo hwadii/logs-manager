@@ -13,11 +13,11 @@ public interface GestionnaireInterface extends Remote {
 	 * @throws RemoteException
 	 * @throws MalformedURLException
 	 */
-	public void ajoueSite(int num) throws MalformedURLException, RemoteException, NotBoundException;
+	public void ajoutSite(int num) throws MalformedURLException, RemoteException, NotBoundException;
 
 	public void panne(int num) throws RemoteException, MalformedURLException, NotBoundException;
 
 	public int getIdRelai() throws RemoteException;
 	
-    public void setIdRelai(int id) throws RemoteException;
+  public void setIdRelai(int id) throws RemoteException;
 }

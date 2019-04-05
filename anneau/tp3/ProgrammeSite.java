@@ -35,7 +35,7 @@ public class ProgrammeSite extends UnicastRemoteObject implements SiteInterface 
 			idr = id;
 		}
 		relai = (SiteInterface) Naming.lookup("rmi://localhost/Site"+num_sousreseau+idr) ;
-		gestionnaire.ajoueSite(id);
+		gestionnaire.ajoutSite(id);
 		ArrayList<Integer> liste = new ArrayList<Integer>();
 		liste.add(id);
 		if (siteSuivant != null){

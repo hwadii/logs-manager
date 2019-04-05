@@ -22,7 +22,7 @@ public class GestionnaireAnneau extends UnicastRemoteObject implements Gestionna
     // Service appelé par un nouveau site pour s'ajouter à la liste et actualise les
     // services suivants des sites
     // num: id du nouveau site
-    public synchronized void ajoueSite(int num) throws MalformedURLException, RemoteException, NotBoundException {
+    public synchronized void ajoutSite(int num) throws MalformedURLException, RemoteException, NotBoundException {
         if (liste.size()>0){
             try {
                 if (liste.contains(num)) liste.remove(liste.indexOf(num));
@@ -38,13 +38,13 @@ public class GestionnaireAnneau extends UnicastRemoteObject implements Gestionna
                     
                     System.out.println("Panne du suivant " + liste.get(0));
                     panne(liste.get(0));
-                    ajoueSite(num);
+                    ajoutSite(num);
                 }
             } catch (RemoteException e) {
 
                 System.out.println("Panne du précédent " + liste.get(liste.size()-1));
                 panne(liste.get(liste.size()-1));
-                ajoueSite(num);
+                ajoutSite(num);
             }
         } else {
             liste.add(num);
