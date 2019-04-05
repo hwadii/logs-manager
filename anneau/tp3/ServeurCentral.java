@@ -1,5 +1,8 @@
 package anneau.tp3;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
@@ -53,13 +56,19 @@ public class ServeurCentral extends UnicastRemoteObject implements ServeurInterf
       }
     }
 
-    System.out.println(log);
+    try {
+      BufferedWriter writer = new BufferedWriter(new FileWriter("log.txt"));
+      writer.write(log);
+      writer.close();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    // System.out.println(log);
   }
 
   @Override
   public synchronized void ecritureLogGlobal(String message) throws MalformedURLException, RemoteException, NotBoundException {
     log += message;
-    log = "";
   }
 
   public static void main(String[] args) throws RemoteException, MalformedURLException, NotBoundException, InterruptedException{
