@@ -50,6 +50,7 @@ Chaque commande doit être exécutée dans un nouveau terminal:
 - Prise en charge des pannes
 - Écriture sur un fichier `logs.txt` 
 - Utilisation de `synchronized`
+- Implémentatin de l'algorithme de Chang et Roberts
 
 ## Étudiants
 - COLAS Adam
