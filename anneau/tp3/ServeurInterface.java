@@ -10,9 +10,8 @@ import java.rmi.RemoteException;
  */
 public interface ServeurInterface extends Remote {
 
-  public void ecritueLogGlobal(String message) throws MalformedURLException, RemoteException, NotBoundException;
-
+  public void ecritureLogGlobal(String message) throws MalformedURLException, RemoteException, NotBoundException;
+  
   public void ajoutSousReseau(int idSousReseau) throws MalformedURLException, RemoteException, NotBoundException;
 
-  public void demandeLog() throws MalformedURLException, RemoteException, NotBoundException;
 }

@@ -19,11 +19,13 @@ public class ProgrammeSite extends UnicastRemoteObject implements SiteInterface 
 	private SiteInterface relai;
 	private String log;
 	private String tmplog;
+	private ServeurInterface serveurCentral;
 
 	public ProgrammeSite(int val, String sr) throws RemoteException, MalformedURLException, NotBoundException {
 		id = val;
 		num_sousreseau = sr;
 		gestionnaire = (GestionnaireInterface) Naming.lookup("rmi://localhost/SousReseau"+num_sousreseau) ;
+		serveurCentral = (ServeurInterface) Naming.lookup("rmi://localhost/ServeurCentral");
 		log = "";
 		tmplog = "";
 	}
@@ -106,6 +108,12 @@ public class ProgrammeSite extends UnicastRemoteObject implements SiteInterface 
 		log = log + message + "\n";
 		System.out.println("Nouveau log: ");
 		System.out.println(log);
+	}
+
+	@Override
+	public void ecritureGlobal() throws MalformedURLException, RemoteException, NotBoundException {
+		serveurCentral.ecritureLogGlobal(log);
+		log = "";
 	}
 
 	public static void main(String[] args) throws NumberFormatException, RemoteException, MalformedURLException, NotBoundException {

@@ -14,38 +14,60 @@ public class ServeurCentral extends UnicastRemoteObject implements ServeurInterf
 
   private static final long serialVersionUID = -2576654020096422139L;
   private String log;
-  private ArrayList<GestionnaireInterface> listeSousReseaux;
+  private ArrayList<Integer> listeSousReseaux;
+  private ArrayList<Integer> listeIdRelais;
 
   public ServeurCentral() throws RemoteException {
     log = "";
     listeSousReseaux = new ArrayList<>();
+    listeIdRelais = new ArrayList<>();
   }
 
   @Override
   public void ajoutSousReseau(int idSousReseau) throws MalformedURLException, RemoteException, NotBoundException {
-    listeSousReseaux.add((GestionnaireInterface) Naming.lookup("rmi://localhost/SousReseau"+idSousReseau));
+    listeSousReseaux.add(idSousReseau);
   }
 
-  @Override
-  public void demandeLog() throws MalformedURLException, RemoteException, NotBoundException {
-    ArrayList<Integer> listeIdRelais = new ArrayList<>();
-    for (GestionnaireInterface g : listeSousReseaux) {
+  public void run() throws MalformedURLException, RemoteException, NotBoundException {
+    System.out.println("je suis dans le run");
+    listeIdRelais.clear();
+    GestionnaireInterface g;
+    for (int id : listeSousReseaux) {
+      g = (GestionnaireInterface) Naming.lookup("rmi://localhost/SousReseau"+id);
       listeIdRelais.add(g.getIdRelai());
     }
-
+    
+    System.out.println("Sous reseaux: " + listeSousReseaux);
+    System.out.println("Id Relais " + listeIdRelais);
     SiteInterface relai;
-    for (int idRelai : listeIdRelais) {
-      relai = (SiteInterface) Naming.lookup("rmi://localhost/Site"+id);
+    for (int i = 0; i < listeIdRelais.size(); i++) {
+      try {
+        if (listeIdRelais.get(i) != -1) {
+          relai = (SiteInterface) Naming.lookup("rmi://localhost/Site"+listeSousReseaux.get(i)+listeIdRelais.get(i));
+          relai.ecritureGlobal();
+          System.out.println(listeSousReseaux.get(i) + " " +listeIdRelais.get(i));
+        }
+      } catch (RemoteException  e) {
+        g = (GestionnaireInterface) Naming.lookup("rmi://localhost/SousReseau"+listeSousReseaux.get(i));
+        g.panne(listeIdRelais.get(i));
+      }
     }
+
+    System.out.println(log);
   }
 
   @Override
-  public synchronized void ecritueLogGlobal(String message) throws MalformedURLException, RemoteException, NotBoundException {
+  public synchronized void ecritureLogGlobal(String message) throws MalformedURLException, RemoteException, NotBoundException {
     log += message;
+    log = "";
   }
 
-  public static void main(String[] args) throws RemoteException, MalformedURLException {
+  public static void main(String[] args) throws RemoteException, MalformedURLException, NotBoundException, InterruptedException{
     ServeurCentral serveurCentral = new ServeurCentral();
     Naming.rebind("ServeurCentral", serveurCentral);
+    while (true) {
+      serveurCentral.run();
+      Thread.sleep(5000);
+    }
   }
 }

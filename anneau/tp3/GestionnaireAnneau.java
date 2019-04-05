@@ -90,8 +90,10 @@ public class GestionnaireAnneau extends UnicastRemoteObject implements Gestionna
     }
 
     //On crée un gestionnaire d'anneau et on expose ses services
-    public static void main(String[] args) throws NumberFormatException, RemoteException, MalformedURLException {
+    public static void main(String[] args) throws NotBoundException, RemoteException, MalformedURLException {
         GestionnaireAnneau serveurAnneau = new GestionnaireAnneau(Integer.parseInt(args[0]));
+        ServeurInterface serveurCentral = (ServeurInterface) Naming.lookup("rmi://localhost/ServeurCentral");
+        serveurCentral.ajoutSousReseau(Integer.parseInt(args[0]));
         Naming.rebind ("SousReseau"+args[0], serveurAnneau);
     }
 

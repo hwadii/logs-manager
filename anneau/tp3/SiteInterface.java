@@ -23,4 +23,6 @@ public interface SiteInterface extends Remote {
   public void envoieMsgRelai(String message) throws RemoteException;
 
   public void ecriture(String message) throws RemoteException;
+
+  public void ecritureGlobal() throws MalformedURLException, RemoteException, NotBoundException;  
 }
